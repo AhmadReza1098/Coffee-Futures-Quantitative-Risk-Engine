@@ -1,179 +1,155 @@
-Coffee C® Futures: Quantitative Risk & Pricing Engine
+# Coffee C® Futures: Quantitative Risk & Pricing Engine
 
-Bridging physical logistics with stochastic modeling to protect procurement budgets from market volatility.
+An integrated financial framework that bridges theoretical commodity pricing with stochastic market forecasting. This project utilizes a hybrid workflow, combining Excel for logistical modeling and Python for high-fidelity stress testing.
 
-📌 Table of Contents
+---
 
-Overview
+## 📑 Table of Contents
 
-Business Problem
+- [Overview](#overview)  
+- [Business Problem](#business-problem)  
+- [Dataset](#dataset)  
+- [Tools & Technologies](#tools--technologies)  
+- [Project Structure](#project-structure)  
+- [Data Cleaning & Preparation](#data-cleaning--preparation)  
+- [Exploratory Data Analysis (EDA)](#exploratory-data-analysis-eda)  
+- [Research Questions & Key Findings](#research-questions--key-findings)  
+- [How to Run This Project](#how-to-run-this-project)  
+- [Future Enhancements](#future-enhancements)  
+- [Author & Contact](#author--contact)  
 
-Dataset
+---
 
-🛠️ Tech Stack & Tools
+## Overview
 
-Project Structure
-
-Data Cleaning & Preparation
-
-Exploratory Data Analysis (EDA)
-
-Research Questions & Key Findings
-
-How to Run This Project
-
-Future Enhancements
-
-Author & Contact
-
-Overview
-
-In global commodity trading, "market jitters" aren't just a metaphor—they represent a massive financial risk. For a coffee roaster, a sudden price spike can erase an entire year's profit margin in a single week. By the time a supply shock hits the news, it’s often too late to hedge.
+In global commodity trading, the price of a future contract isn't just a "guess" it is a combination of today's spot price, the cost of storage, and the price of capital. This project provides a decision-support system to determine if the market is "fairly priced" and calculates the statistical probability of different market outcomes to help procurement teams manage risk.
 
 In this project, I didn't just calculate a price; I built an integrated risk engine. Instead of relying on intuition or static spreadsheets, I combined the "Physical Truth" of logistics with the "Probabilistic Reality" of the market. My goal was to move beyond simple forecasting and create a tool that quantifies the "Fan of Uncertainty," allowing procurement teams to lock in certainty when the market offers none.
 
-Business Problem
+---
 
-Procurement managers for soft commodities face a constant "Buyer’s Dilemma": If we buy today, we pay for storage and tie up capital. If we wait, we risk a supply shock. Currently, the coffee market is experiencing ~39.3% annualized volatility, making "waiting and seeing" a dangerous strategy.
+## Business Problem
 
-This project aims to:
+Coffee is a notoriously volatile commodity (currently at ~39.3% annualized volatility). Procurement managers face the "Buyer’s Dilemma":
 
-Determine the Fair Value: Calculate exactly what it costs to buy, store, and insure coffee for 6 months to see if the market is "overpriced."
+- Do we buy today and pay to store it? (**Project 1**)
+- Do we buy an option to protect against price spikes? (**Project 2**)
+- Or is the market currently overpriced compared to its physical reality?
 
-Evaluate the Safety Net: Use the Black-Scholes Model to see if paying a $0.34 premium for a call option is a statistically sound investment.
+This Project Aims to:
 
-Stress-Test the Future: Run 1,000 "what-if" scenarios to identify "Fat-Tail" risks—those rare but catastrophic price spikes that destroy budgets.
+- Determine the Fair Value: Calculate exactly what it costs to buy, store, and insure coffee for 6 months to see if the market is "overpriced."
 
-Dataset
+- Evaluate the Safety Net: Use the Black-Scholes Model to see if paying a $0.34 premium for a call option is a statistically sound investment.
 
-Source: ICE Coffee C® Futures (via Yahoo Finance/Market Data).
+- Stress-Test the Future: Run 10,000 "what-if" scenarios to identify "Fat-Tail" risks—those rare but catastrophic price spikes that destroy budgets.
 
-Key variables used in the engine:
+This engine provides a quantitative answer by stress-testing theoretical models against 1,000 simulated price paths.
 
-Spot Price ($2.94) – The "Right Now" price on the exchange.
+---
 
-Volatility (39.30%) – Annualized historical risk metric.
+## Dataset
 
-Risk-Free Rate (3.58%) – The 10-Year Treasury Yield.
+- Source: ICE Coffee C® Futures (via Yahoo Finance/Market Data).
 
-Storage & Insurance (1.00%) – Physical logistics cost.
+- Composition: 252+ rows of historical closing prices used to calibrate annualized volatility.
 
-Time to Maturity (0.5) – A 6-month hedging horizon.
+- Granularity: Daily trading close.
+---
 
-🛠️ Tech Stack & Tools
+## Tools & Technologies
 
-Language: Python 3.9+ (Simulation Engine)
+* Analysis & Logic: **Microsoft Excel (Financial Functions, Analysis ToolPak)**.
 
-Logic Center: Microsoft Excel (Cost of Carry & BSM Dashboards)
+* Simulation Engine: **Python (NumPy for GBM, Matplotlib for Visuals, Pandas for Data Structuring)**.
 
-Data Manipulation: NumPy, Pandas
+* Statistical Logic: **Geometric Brownian Motion (GBM), Black-Scholes Model (BSM), Cost of Carry**.
+---
 
-Visualization: Matplotlib (Stochastic Path Dispersion & Histograms)
+## Project Structure
 
-Financial Logic: Geometric Brownian Motion (GBM), Black-Scholes Model (BSM)
-
-Project Structure
-
+```
 Coffee-Risk-Engine/
 │
 ├── README.md                          
 ├── requirements.txt                   
-├── Coffee_Strategy_Dashboard.xlsx     # The "Control Center"
 │
-├── notebooks/
+├── data/
+│   └── coffee_data.csv                
+│
+├── model/
+│   └── Coffee_Strategy_Dashboard.xlsx 
+│
+├── scripts/
 │   └── Stochastic_Engine_1000_Paths.ipynb  
 │
-└── visuals/
-    ├── Figure_1_Dispersion.png        # The "Journey"
-    └── Figure_2_Histogram.png         # The "Destination"
+├── visuals/
+│   ├── Figure_1_Dispersion.png        
+│   └── Figure_2_Histogram.png         
+│
+└── reports/
+    └── Executive_Summary_Report.pdf 
+```
 
+## Data Cleaning & Preparation
 
-Data Cleaning & Preparation
+To ensure high-fidelity simulations, the raw historical data underwent the following processing:
 
-To transform raw price data into a high-fidelity simulation, I adopted a "Stochastic Readiness" strategy:
+**Return Calculation**: Converted absolute prices into Logarithmic Returns to ensure normality in the stochastic process.
 
-Log-Return Calibration: I converted absolute prices into Logarithmic Returns. This ensures that our price paths follow a normal distribution, preventing the model from predicting impossible "negative" coffee prices.
+**Volatility Calibration**: Annualized the standard deviation of returns ($\sigma = \text{STDEV}(\text{Log Returns}) \times \sqrt{252}$).
 
-Volatility Annualization: I calculated the standard deviation of daily returns and scaled it by $\sqrt{252}$ to get a true 39.30% annualized volatility.
+**Time-Step Synchronization**: Mapped the 6-month maturity ($T=0.5$) to exactly 126 trading days ($dt = T/126$).
 
-Time-Step Synchronization: I mapped the 6-month window into exactly 126 trading days ($dt = T/126$) to ensure the Python engine and Excel dashboard were perfectly aligned.
+---
 
-Exploratory Data Analysis (EDA)
+## Exploratory Data Analysis (EDA)
 
-Before running simulations, I analyzed the "shape" of the market risk. I didn't just look for trends; I looked for the volatility story.
+**Volatility Analysis**: The historical data revealed an annualized volatility of 39.30%, indicating a high-risk environment where prices frequently deviate from the mean.
 
-The "High-Beta" Reality: Coffee showed significantly higher volatility (39.3%) compared to other soft commodities. This immediately flagged that a simple "Buy and Hold" strategy was insufficient—an options-based "Safety Net" was mandatory.
+**Trend Observation**: Visual analysis of historical price action showed significant "clustering," suggesting that price shocks tend to persist, justifying the need for a non-linear hedge (Options).
 
-The Journey vs. The Destination: I noticed that while the average trend was stable, the daily swings were large enough to trigger margin calls. This finding drove my decision to use Price-Path Dispersion (Fig 1) to visualize the daily stress on the portfolio.
+---
 
-The "Fat-Tail" Observation: Historical spikes were not normally distributed; they were "skewed." This proved that a standard average price wouldn't be enough to protect the budget—we had to model for the extreme 1% events.
+## Research Questions & Key Findings
 
-Research Questions & Key Findings
+* **Q1: What is the "Fair Value" of the future?**
 
-I framed my analysis around three critical business questions:
+Finding: Based on logistical costs ($r$ and $d$), the fair price is $3.01. If market trading is > $3.01, the market is "overpriced" relative to physical carry costs.
 
-Question 1: Is the market "Overpricing" the future?
+* **Q2: Is the $0.34 Option Premium a good deal?**
 
-Finding: The Physical Baseline is $3.01.
+Finding: Yes. Given the high volatility, the $0.34 premium acts as an affordable insurance policy to cap procurement costs at **$2.95**.
 
-My Cost of Carry model revealed that buying and storing coffee yourself costs $3.01.
+* **Q3: What is the likelihood of a supply shock?**
 
-The Insight: If the ICE exchange is trading at $3.10, the market is "Overpriced." It's cheaper to buy the beans and rent a warehouse than to buy the future contract.
+Finding: The 1,000-path Monte Carlo simulation reveals a skewed "Fat Tail" risk. While the average price sits at $3.04, extreme scenarios show prices spiking toward $4.00, far exceeding the cost of the hedge.
 
-Question 2: Is it better to be "Certain" or "Lucky"?
+---
 
-Finding: The $0.34 Premium is a high-value hedge.
+## How to Run This Project
 
-With a $2.95 Strike Price, our BSM calculation showed the option is "At-the-Money."
+Logistics: Open the Excel Dashboard to view the static Fair Value and BSM calculations.
 
-The Insight: We pay a small premium today to "delete" the risk of prices hitting $4.00. We accepted the cost of the premium to guarantee a "ceiling" on our costs.
+Simulation: Run the .ipynb script in Jupyter or Google Colab to regenerate the 1,000 price paths.
 
-Question 3: What do 1,000 different futures say?
+Synthesis: Check the "Executive Summary" tab in Excel to see the integrated dashboard (with side-by-side Fig 1 & Fig 2).
 
-Finding: The "Center of Gravity" is $3.04.
+---
 
-After running 1,000 paths, the Monte Carlo simulation settled at an average of $3.04—higher than our $2.95 Strike.
+## Future Enhancements
 
-The Insight: Our "Safety Net" (Recall equivalent) is highly effective. In 64% of scenarios, the market ends up higher than our strike, proving the call option is the most logical path for a risk-averse business.
+* **Dynamic Delta Hedging**: Implementing a script to manage the option position as the market moves.
 
-How to Run This Project
+* **GARCH Modeling**: Upgrading from static volatility to account for "volatility clustering."
 
-Clone the Repository
+* **Live API Integration**: Connecting the Excel Dashboard directly to real-time market feeds via Python.
 
-git clone [https://github.com/AhmadReza1098/Coffee-Risk-Engine](https://github.com/AhmadReza1098/Coffee-Risk-Engine)
+---
 
+## Author & Contact
 
-Install Dependencies
-
-pip install -r requirements.txt
-
-
-Run the Simulation
-
-Open Stochastic_Engine_1000_Paths.ipynb in Jupyter.
-
-Run all cells to generate Figure 1 (Dispersion) and Figure 2 (Histogram).
-
-Check the Dashboard
-
-Open Coffee_Strategy_Dashboard.xlsx.
-
-View the "Executive Summary" tab to see the side-by-side plots and the final $3.01 vs $3.04 comparison.
-
-Future Enhancements
-
-GARCH(1,1) Volatility: Upgrade from static volatility to "Vol-Clustering" to better predict price shocks.
-
-Live API Integration: Connect the Excel Control Center to live ICE market feeds via a Python API wrapper.
-
-Dynamic Delta Hedging: Build a script to suggest daily "rebalancing" of the hedge as time-decay (Theta) eats into the option value.
-
-Author & Contact
-
-Ahmad Reza Aspiring Data Analyst – Financial Engineering & BI
-
-📧 Email: ahmadreza6122@gmail.com
-
-🔗 LinkedIn: www.linkedin.com/in/ahmad-reza-econ
-
-🔗 GitHub: https://github.com/AhmadReza1098
+**Ahmad Reza**
+- 📧 Email: ahmadreza6122@gmail.com  
+- www.linkedin.com/in/ahmad-reza-econ 
+- https://github.com/AhmadReza1098 
